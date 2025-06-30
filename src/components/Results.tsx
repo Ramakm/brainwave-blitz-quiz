@@ -15,6 +15,7 @@ interface ResultsProps {
   }>;
   userAnswers: (number | null)[];
   playerName: string;
+  quizType: 'quick' | 'extended';
   onRestart: () => void;
   onShowLeaderboard: () => void;
 }
@@ -25,6 +26,7 @@ export const Results: React.FC<ResultsProps> = ({
   questions,
   userAnswers,
   playerName,
+  quizType,
   onRestart,
   onShowLeaderboard
 }) => {
@@ -44,6 +46,10 @@ export const Results: React.FC<ResultsProps> = ({
     return "Keep studying! You'll improve with practice!";
   };
 
+  const getQuizTypeLabel = () => {
+    return quizType === 'quick' ? '⚡ Quick Quiz' : '🎯 Extended Quiz';
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-900 via-teal-900 to-cyan-900 p-4 font-inter">
       <div className="max-w-4xl mx-auto">
@@ -52,6 +58,9 @@ export const Results: React.FC<ResultsProps> = ({
             <CardTitle className="text-4xl font-bold text-white mb-4 font-poppins">
               Quiz Complete! {getScoreEmoji()}
             </CardTitle>
+            <div className="text-lg text-emerald-200 mb-2">
+              {getQuizTypeLabel()}
+            </div>
             <div className="text-2xl text-emerald-200 mb-2 font-poppins">
               Well done, {playerName}!
             </div>
@@ -79,6 +88,20 @@ export const Results: React.FC<ResultsProps> = ({
             >
               View Leaderboard
             </Button>
+
+            <div className="mt-6 pt-4 border-t border-white/20">
+              <p className="text-white/60 text-sm">
+                Developed by{' '}
+                <a 
+                  href="https://x.com/techwith_ram" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-emerald-300 hover:text-emerald-200 font-medium underline transition-colors"
+                >
+                  Ramkrushna
+                </a>
+              </p>
+            </div>
           </CardContent>
         </Card>
 

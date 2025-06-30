@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 
@@ -9,6 +9,7 @@ interface LeaderboardEntry {
   totalQuestions: number;
   percentage: number;
   timestamp: string;
+  quizType: 'quick' | 'extended';
 }
 
 interface LeaderboardProps {
@@ -17,6 +18,10 @@ interface LeaderboardProps {
 }
 
 export const Leaderboard: React.FC<LeaderboardProps> = ({ leaderboard, onBack }) => {
+  const [selectedType, setSelectedType] = useState<'quick' | 'extended'>('quick');
+
+  const filteredLeaderboard = leaderboard.filter(entry => entry.quizType === selectedType);
+
   const formatDate = (timestamp: string) => {
     return new Date(timestamp).toLocaleDateString();
   };
@@ -30,6 +35,10 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ leaderboard, onBack })
     }
   };
 
+  const getQuizTypeLabel = (type: 'quick' | 'extended') => {
+    return type === 'quick' ? '⚡ Quick Quiz (60s)' : '🎯 Extended Quiz (5min)';
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-900 via-teal-900 to-cyan-900 p-4 font-inter">
       <div className="max-w-4xl mx-auto">
@@ -41,16 +50,47 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ leaderboard, onBack })
             <p className="text-emerald-100">
               Top performers in the AI/ML Quiz Challenge
             </p>
+            
+            <div className="flex justify-center mt-6">
+              <div className="bg-white/5 rounded-lg p-1 flex">
+                <button
+                  onClick={() => setSelectedType('quick')}
+                  className={`px-4 py-2 rounded-md transition-all font-medium ${
+                    selectedType === 'quick'
+                      ? 'bg-emerald-500 text-white'
+                      : 'text-white/70 hover:text-white hover:bg-white/10'
+                  }`}
+                >
+                  ⚡ Quick Quiz
+                </button>
+                <button
+                  onClick={() => setSelectedType('extended')}
+                  className={`px-4 py-2 rounded-md transition-all font-medium ${
+                    selectedType === 'extended'
+                      ? 'bg-emerald-500 text-white'
+                      : 'text-white/70 hover:text-white hover:bg-white/10'
+                  }`}
+                >
+                  🎯 Extended Quiz
+                </button>
+              </div>
+            </div>
           </CardHeader>
           <CardContent>
-            {leaderboard.length === 0 ? (
+            <div className="text-center mb-4">
+              <h3 className="text-white font-semibold text-lg">
+                {getQuizTypeLabel(selectedType)}
+              </h3>
+            </div>
+
+            {filteredLeaderboard.length === 0 ? (
               <div className="text-center py-8">
-                <p className="text-white/70 text-lg">No scores yet!</p>
-                <p className="text-white/50">Be the first to take the quiz.</p>
+                <p className="text-white/70 text-lg">No scores yet for this quiz type!</p>
+                <p className="text-white/50">Be the first to take the {selectedType} quiz.</p>
               </div>
             ) : (
               <div className="space-y-3">
-                {leaderboard.map((entry, index) => (
+                {filteredLeaderboard.map((entry, index) => (
                   <div
                     key={`${entry.name}-${entry.timestamp}`}
                     className={`flex items-center justify-between p-4 rounded-lg border ${
@@ -96,6 +136,20 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ leaderboard, onBack })
               >
                 Back to Quiz
               </Button>
+
+              <div className="mt-6 pt-4 border-t border-white/20">
+                <p className="text-white/60 text-sm">
+                  Developed by{' '}
+                  <a 
+                    href="https://x.com/techwith_ram" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-emerald-300 hover:text-emerald-200 font-medium underline transition-colors"
+                  >
+                    Ramkrushna
+                  </a>
+                </p>
+              </div>
             </div>
           </CardContent>
         </Card>

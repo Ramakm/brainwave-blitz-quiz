@@ -5,17 +5,18 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
 interface PlayerSetupProps {
-  onStartQuiz: (name: string) => void;
+  onStartQuiz: (name: string, quizType: 'quick' | 'extended') => void;
   onShowLeaderboard: () => void;
 }
 
 export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onStartQuiz, onShowLeaderboard }) => {
   const [name, setName] = useState('');
+  const [selectedQuizType, setSelectedQuizType] = useState<'quick' | 'extended'>('quick');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (name.trim()) {
-      onStartQuiz(name.trim());
+      onStartQuiz(name.trim(), selectedQuizType);
     }
   };
 
@@ -31,11 +32,38 @@ export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onStartQuiz, onShowLea
           </p>
         </CardHeader>
         <CardContent className="space-y-6">
-          <div className="space-y-3 text-emerald-100">
-            <p>📝 20 random questions</p>
-            <p>⏱️ 60 seconds total</p>
-            <p>🎯 Multiple choice format</p>
-            <p>🏆 Compete on the leaderboard</p>
+          <div className="space-y-4">
+            <div className="space-y-3">
+              <h3 className="text-white font-semibold text-lg font-poppins">Choose Quiz Type:</h3>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setSelectedQuizType('quick')}
+                  className={`p-3 rounded-lg border-2 transition-all ${
+                    selectedQuizType === 'quick'
+                      ? 'bg-emerald-500/30 border-emerald-400 text-white'
+                      : 'bg-white/5 border-white/20 text-white/70 hover:bg-white/10'
+                  }`}
+                >
+                  <div className="font-semibold">⚡ Quick Quiz</div>
+                  <div className="text-sm">60 seconds</div>
+                  <div className="text-sm">20 questions</div>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSelectedQuizType('extended')}
+                  className={`p-3 rounded-lg border-2 transition-all ${
+                    selectedQuizType === 'extended'
+                      ? 'bg-emerald-500/30 border-emerald-400 text-white'
+                      : 'bg-white/5 border-white/20 text-white/70 hover:bg-white/10'
+                  }`}
+                >
+                  <div className="font-semibold">🎯 Extended Quiz</div>
+                  <div className="text-sm">5 minutes</div>
+                  <div className="text-sm">20 questions</div>
+                </button>
+              </div>
+            </div>
           </div>
           
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -61,10 +89,24 @@ export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onStartQuiz, onShowLea
           <Button
             onClick={onShowLeaderboard}
             variant="outline"
-            className="w-full py-2 text-white border-white/30 hover:bg-white/10 font-medium"
+            className="w-full py-2 text-white border-white/30 hover:bg-white/10 font-medium bg-white/5"
           >
-            View Leaderboard
+            🏆 View Leaderboard
           </Button>
+
+          <div className="mt-8 pt-4 border-t border-white/20">
+            <p className="text-white/60 text-sm">
+              Developed by{' '}
+              <a 
+                href="https://x.com/techwith_ram" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-emerald-300 hover:text-emerald-200 font-medium underline transition-colors"
+              >
+                Ramkrushna
+              </a>
+            </p>
+          </div>
         </CardContent>
       </Card>
     </div>

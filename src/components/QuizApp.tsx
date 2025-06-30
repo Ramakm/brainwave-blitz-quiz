@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Timer } from './Timer';
 import { Question } from './Question';
@@ -22,6 +21,7 @@ interface LeaderboardEntry {
   totalQuestions: number;
   percentage: number;
   timestamp: string;
+  quizType: 'quick' | 'extended';
 }
 
 const quizQuestions: QuizQuestion[] = [
@@ -255,6 +255,7 @@ const quizQuestions: QuizQuestion[] = [
 export const QuizApp: React.FC = () => {
   const [gameState, setGameState] = useState<'setup' | 'playing' | 'finished' | 'leaderboard'>('setup');
   const [playerName, setPlayerName] = useState<string>('');
+  const [quizType, setQuizType] = useState<'quick' | 'extended'>('quick');
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [score, setScore] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
@@ -280,20 +281,21 @@ export const QuizApp: React.FC = () => {
   };
 
   const saveToLeaderboard = (entry: LeaderboardEntry) => {
-    const updated = [...leaderboard, entry].sort((a, b) => b.percentage - a.percentage).slice(0, 10);
+    const updated = [...leaderboard, entry].sort((a, b) => b.percentage - a.percentage).slice(0, 20);
     setLeaderboard(updated);
     localStorage.setItem('quiz-leaderboard', JSON.stringify(updated));
   };
 
-  const startQuiz = (name: string) => {
+  const startQuiz = (name: string, selectedQuizType: 'quick' | 'extended') => {
     const shuffled = shuffleArray(quizQuestions);
     setShuffledQuestions(shuffled);
     setUserAnswers(new Array(shuffled.length).fill(null));
     setPlayerName(name);
+    setQuizType(selectedQuizType);
     setGameState('playing');
     setCurrentQuestionIndex(0);
     setScore(0);
-    setTimeLeft(60);
+    setTimeLeft(selectedQuizType === 'quick' ? 60 : 300);
     setSelectedAnswer(null);
   };
 
@@ -324,7 +326,8 @@ export const QuizApp: React.FC = () => {
       score,
       totalQuestions: shuffledQuestions.length,
       percentage,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      quizType
     };
     saveToLeaderboard(entry);
     setGameState('finished');
@@ -339,6 +342,7 @@ export const QuizApp: React.FC = () => {
     setShuffledQuestions([]);
     setUserAnswers([]);
     setPlayerName('');
+    setQuizType('quick');
   };
 
   const showLeaderboard = () => {
@@ -374,18 +378,24 @@ export const QuizApp: React.FC = () => {
         questions={shuffledQuestions}
         userAnswers={userAnswers}
         playerName={playerName}
+        quizType={quizType}
         onRestart={resetQuiz}
         onShowLeaderboard={showLeaderboard}
       />
     );
   }
 
+  const getQuizTypeLabel = () => {
+    return quizType === 'quick' ? '⚡ Quick Quiz' : '🎯 Extended Quiz';
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-900 via-teal-900 to-cyan-900 p-4 font-inter">
       <div className="max-w-4xl mx-auto">
         <div className="mb-6 flex justify-between items-center">
           <div className="text-white">
-            <span className="text-lg font-semibold">Question {currentQuestionIndex + 1} of {shuffledQuestions.length}</span>
+            <div className="text-lg font-semibold">{getQuizTypeLabel()}</div>
+            <span className="text-base">Question {currentQuestionIndex + 1} of {shuffledQuestions.length}</span>
             <span className="ml-4 text-emerald-200">Score: {score}</span>
             <span className="ml-4 text-emerald-200">Player: {playerName}</span>
           </div>
