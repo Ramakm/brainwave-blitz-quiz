@@ -24,7 +24,7 @@ export const Question: React.FC<QuestionProps> = ({
   return (
     <Card className="bg-white/10 backdrop-blur-lg border-white/20">
       <CardHeader>
-        <CardTitle className="text-white text-xl">
+        <CardTitle className="text-white text-xl font-poppins">
           {question.question}
         </CardTitle>
       </CardHeader>
@@ -35,12 +35,12 @@ export const Question: React.FC<QuestionProps> = ({
             const isCorrect = selectedAnswer !== null && index === question.correctAnswer;
             const isWrong = selectedAnswer !== null && selectedAnswer === index && index !== question.correctAnswer;
             
-            let buttonClass = "w-full text-left p-4 rounded-lg border-2 transition-all duration-200 ";
+            let buttonClass = "w-full text-left p-4 rounded-lg border-2 transition-all duration-200 font-medium ";
             
             if (selectedAnswer === null) {
               buttonClass += "bg-white/5 border-white/20 text-white hover:bg-white/10 hover:border-white/40 transform hover:scale-[1.02]";
             } else if (isCorrect) {
-              buttonClass += "bg-green-500/20 border-green-400 text-green-100";
+              buttonClass += "bg-emerald-500/20 border-emerald-400 text-emerald-100";
             } else if (isWrong) {
               buttonClass += "bg-red-500/20 border-red-400 text-red-100";
             } else {
@@ -61,7 +61,7 @@ export const Question: React.FC<QuestionProps> = ({
                   </span>
                   {option}
                   {selectedAnswer !== null && isCorrect && (
-                    <span className="ml-auto text-green-400">✓</span>
+                    <span className="ml-auto text-emerald-400">✓</span>
                   )}
                   {selectedAnswer !== null && isWrong && (
                     <span className="ml-auto text-red-400">✗</span>

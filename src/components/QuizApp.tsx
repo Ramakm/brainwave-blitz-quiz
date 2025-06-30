@@ -3,6 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { Timer } from './Timer';
 import { Question } from './Question';
 import { Results } from './Results';
+import { PlayerSetup } from './PlayerSetup';
+import { Leaderboard } from './Leaderboard';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -12,6 +14,14 @@ interface QuizQuestion {
   options: string[];
   correctAnswer: number;
   explanation: string;
+}
+
+interface LeaderboardEntry {
+  name: string;
+  score: number;
+  totalQuestions: number;
+  percentage: number;
+  timestamp: string;
 }
 
 const quizQuestions: QuizQuestion[] = [
@@ -119,17 +129,139 @@ const quizQuestions: QuizQuestion[] = [
     ],
     correctAnswer: 1,
     explanation: "Transfer learning involves using a pre-trained model as a starting point for a new, related task, leveraging previously learned features."
+  },
+  {
+    id: 11,
+    question: "What is backpropagation in neural networks?",
+    options: [
+      "Forward pass through the network",
+      "Algorithm to update weights by propagating errors backward",
+      "Data preprocessing technique",
+      "Method to initialize weights"
+    ],
+    correctAnswer: 1,
+    explanation: "Backpropagation is an algorithm that calculates gradients by propagating errors backward through the network to update weights."
+  },
+  {
+    id: 12,
+    question: "What is the purpose of cross-validation?",
+    options: [
+      "To speed up training",
+      "To assess model performance and generalization",
+      "To clean data",
+      "To visualize results"
+    ],
+    correctAnswer: 1,
+    explanation: "Cross-validation helps assess how well a model generalizes by testing it on different subsets of data."
+  },
+  {
+    id: 13,
+    question: "What is the difference between classification and regression?",
+    options: [
+      "No difference",
+      "Classification predicts categories, regression predicts continuous values",
+      "Regression predicts categories, classification predicts continuous values",
+      "Both predict categories"
+    ],
+    correctAnswer: 1,
+    explanation: "Classification predicts discrete categories or classes, while regression predicts continuous numerical values."
+  },
+  {
+    id: 14,
+    question: "What is feature engineering?",
+    options: [
+      "Building neural networks",
+      "Creating or transforming features to improve model performance",
+      "Hardware optimization",
+      "Data visualization"
+    ],
+    correctAnswer: 1,
+    explanation: "Feature engineering involves creating, selecting, or transforming input features to improve machine learning model performance."
+  },
+  {
+    id: 15,
+    question: "What is ensemble learning?",
+    options: [
+      "Using a single powerful model",
+      "Combining multiple models to improve predictions",
+      "Training on multiple datasets",
+      "Using multiple algorithms sequentially"
+    ],
+    correctAnswer: 1,
+    explanation: "Ensemble learning combines predictions from multiple models to achieve better performance than individual models."
+  },
+  {
+    id: 16,
+    question: "What is the vanishing gradient problem?",
+    options: [
+      "Gradients become too large",
+      "Gradients become very small in deep networks",
+      "No gradients are calculated",
+      "Gradients are calculated incorrectly"
+    ],
+    correctAnswer: 1,
+    explanation: "The vanishing gradient problem occurs when gradients become very small in deep networks, making it difficult to train early layers."
+  },
+  {
+    id: 17,
+    question: "What is reinforcement learning?",
+    options: [
+      "Learning from labeled examples",
+      "Learning through interaction with an environment via rewards",
+      "Learning without any data",
+      "Learning by copying other models"
+    ],
+    correctAnswer: 1,
+    explanation: "Reinforcement learning involves an agent learning optimal actions through trial and error, receiving rewards or penalties from the environment."
+  },
+  {
+    id: 18,
+    question: "What is the purpose of dropout in neural networks?",
+    options: [
+      "To speed up training",
+      "To prevent overfitting by randomly removing neurons",
+      "To add more layers",
+      "To initialize weights"
+    ],
+    correctAnswer: 1,
+    explanation: "Dropout randomly sets some neurons to zero during training to prevent overfitting and improve generalization."
+  },
+  {
+    id: 19,
+    question: "What is a convolutional neural network (CNN) primarily used for?",
+    options: [
+      "Text processing",
+      "Image recognition and computer vision",
+      "Time series analysis",
+      "Speech recognition only"
+    ],
+    correctAnswer: 1,
+    explanation: "CNNs are primarily designed for image recognition and computer vision tasks, using convolutional layers to detect local features."
+  },
+  {
+    id: 20,
+    question: "What is natural language processing (NLP)?",
+    options: [
+      "Processing images",
+      "Field of AI focused on interaction between computers and human language",
+      "Network optimization",
+      "Data compression"
+    ],
+    correctAnswer: 1,
+    explanation: "NLP is a field of AI that focuses on enabling computers to understand, interpret, and generate human language."
   }
 ];
 
 export const QuizApp: React.FC = () => {
-  const [gameState, setGameState] = useState<'start' | 'playing' | 'finished'>('start');
+  const [gameState, setGameState] = useState<'setup' | 'playing' | 'finished' | 'leaderboard'>('setup');
+  const [playerName, setPlayerName] = useState<string>('');
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [score, setScore] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [timeLeft, setTimeLeft] = useState(60);
   const [shuffledQuestions, setShuffledQuestions] = useState<QuizQuestion[]>([]);
   const [userAnswers, setUserAnswers] = useState<(number | null)[]>([]);
+  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
 
   const shuffleArray = (array: QuizQuestion[]) => {
     const shuffled = [...array];
@@ -137,13 +269,27 @@ export const QuizApp: React.FC = () => {
       const j = Math.floor(Math.random() * (i + 1));
       [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
     }
-    return shuffled.slice(0, 5); // Take only 5 random questions
+    return shuffled.slice(0, 20);
   };
 
-  const startQuiz = () => {
+  const loadLeaderboard = () => {
+    const saved = localStorage.getItem('quiz-leaderboard');
+    if (saved) {
+      setLeaderboard(JSON.parse(saved));
+    }
+  };
+
+  const saveToLeaderboard = (entry: LeaderboardEntry) => {
+    const updated = [...leaderboard, entry].sort((a, b) => b.percentage - a.percentage).slice(0, 10);
+    setLeaderboard(updated);
+    localStorage.setItem('quiz-leaderboard', JSON.stringify(updated));
+  };
+
+  const startQuiz = (name: string) => {
     const shuffled = shuffleArray(quizQuestions);
     setShuffledQuestions(shuffled);
     setUserAnswers(new Array(shuffled.length).fill(null));
+    setPlayerName(name);
     setGameState('playing');
     setCurrentQuestionIndex(0);
     setScore(0);
@@ -161,64 +307,63 @@ export const QuizApp: React.FC = () => {
       setScore(score + 1);
     }
 
-    // Auto-advance after a short delay
     setTimeout(() => {
       if (currentQuestionIndex < shuffledQuestions.length - 1) {
         setCurrentQuestionIndex(currentQuestionIndex + 1);
         setSelectedAnswer(null);
       } else {
-        setGameState('finished');
+        finishQuiz();
       }
     }, 1000);
   };
 
+  const finishQuiz = () => {
+    const percentage = Math.round((score / shuffledQuestions.length) * 100);
+    const entry: LeaderboardEntry = {
+      name: playerName,
+      score,
+      totalQuestions: shuffledQuestions.length,
+      percentage,
+      timestamp: new Date().toISOString()
+    };
+    saveToLeaderboard(entry);
+    setGameState('finished');
+  };
+
   const resetQuiz = () => {
-    setGameState('start');
+    setGameState('setup');
     setCurrentQuestionIndex(0);
     setScore(0);
     setSelectedAnswer(null);
     setTimeLeft(60);
     setShuffledQuestions([]);
     setUserAnswers([]);
+    setPlayerName('');
   };
+
+  const showLeaderboard = () => {
+    setGameState('leaderboard');
+  };
+
+  useEffect(() => {
+    loadLeaderboard();
+  }, []);
 
   useEffect(() => {
     if (gameState === 'playing' && timeLeft > 0) {
       const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
       return () => clearTimeout(timer);
     } else if (timeLeft === 0 && gameState === 'playing') {
-      setGameState('finished');
+      finishQuiz();
     }
   }, [timeLeft, gameState]);
 
-  if (gameState === 'start') {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center p-4">
-        <Card className="w-full max-w-md text-center bg-white/10 backdrop-blur-lg border-white/20">
-          <CardHeader>
-            <CardTitle className="text-3xl font-bold text-white mb-4">
-              🤖 AI/ML Quiz Challenge
-            </CardTitle>
-            <p className="text-blue-100 text-lg">
-              Test your knowledge of Artificial Intelligence and Machine Learning!
-            </p>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="space-y-3 text-blue-100">
-              <p>📝 5 random questions</p>
-              <p>⏱️ 60 seconds total</p>
-              <p>🎯 Multiple choice format</p>
-            </div>
-            <Button 
-              onClick={startQuiz}
-              className="w-full py-3 text-lg font-semibold bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 transform hover:scale-105 transition-all duration-200"
-            >
-              Start Quiz
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
+  if (gameState === 'setup') {
+    return <PlayerSetup onStartQuiz={startQuiz} onShowLeaderboard={showLeaderboard} />;
+  }
+
+  if (gameState === 'leaderboard') {
+    return <Leaderboard leaderboard={leaderboard} onBack={() => setGameState('setup')} />;
   }
 
   if (gameState === 'finished') {
@@ -228,18 +373,21 @@ export const QuizApp: React.FC = () => {
         totalQuestions={shuffledQuestions.length}
         questions={shuffledQuestions}
         userAnswers={userAnswers}
+        playerName={playerName}
         onRestart={resetQuiz}
+        onShowLeaderboard={showLeaderboard}
       />
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-emerald-900 via-teal-900 to-cyan-900 p-4 font-inter">
       <div className="max-w-4xl mx-auto">
         <div className="mb-6 flex justify-between items-center">
           <div className="text-white">
             <span className="text-lg font-semibold">Question {currentQuestionIndex + 1} of {shuffledQuestions.length}</span>
-            <span className="ml-4 text-blue-200">Score: {score}</span>
+            <span className="ml-4 text-emerald-200">Score: {score}</span>
+            <span className="ml-4 text-emerald-200">Player: {playerName}</span>
           </div>
           <Timer timeLeft={timeLeft} />
         </div>
