@@ -4,6 +4,7 @@ import { Question } from './Question';
 import { Results } from './Results';
 import { PlayerSetup } from './PlayerSetup';
 import { Leaderboard } from './Leaderboard';
+import { FeedbackWidget } from './FeedbackWidget';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -264,13 +265,37 @@ export const QuizApp: React.FC = () => {
   const [userAnswers, setUserAnswers] = useState<(number | null)[]>([]);
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
 
-  const shuffleArray = (array: QuizQuestion[]) => {
-    const shuffled = [...array];
+  // Updated function to shuffle both questions and answers
+  const shuffleQuestions = (questions: QuizQuestion[]) => {
+    const shuffled = [...questions];
+    // Shuffle the questions array
     for (let i = shuffled.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
     }
-    return shuffled.slice(0, 20);
+    
+    // Shuffle the options within each question and update correct answer index
+    const questionsWithShuffledOptions = shuffled.map(question => {
+      const correctOption = question.options[question.correctAnswer];
+      const shuffledOptions = [...question.options];
+      
+      // Fisher-Yates shuffle for options
+      for (let i = shuffledOptions.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffledOptions[i], shuffledOptions[j]] = [shuffledOptions[j], shuffledOptions[i]];
+      }
+      
+      // Find new index of correct answer
+      const newCorrectAnswer = shuffledOptions.findIndex(option => option === correctOption);
+      
+      return {
+        ...question,
+        options: shuffledOptions,
+        correctAnswer: newCorrectAnswer
+      };
+    });
+    
+    return questionsWithShuffledOptions.slice(0, 20);
   };
 
   const loadLeaderboard = () => {
@@ -287,7 +312,7 @@ export const QuizApp: React.FC = () => {
   };
 
   const startQuiz = (name: string, selectedQuizType: 'quick' | 'extended') => {
-    const shuffled = shuffleArray(quizQuestions);
+    const shuffled = shuffleQuestions(quizQuestions);
     setShuffledQuestions(shuffled);
     setUserAnswers(new Array(shuffled.length).fill(null));
     setPlayerName(name);
@@ -363,25 +388,38 @@ export const QuizApp: React.FC = () => {
   }, [timeLeft, gameState]);
 
   if (gameState === 'setup') {
-    return <PlayerSetup onStartQuiz={startQuiz} onShowLeaderboard={showLeaderboard} />;
+    return (
+      <>
+        <PlayerSetup onStartQuiz={startQuiz} onShowLeaderboard={showLeaderboard} />
+        <FeedbackWidget />
+      </>
+    );
   }
 
   if (gameState === 'leaderboard') {
-    return <Leaderboard leaderboard={leaderboard} onBack={() => setGameState('setup')} />;
+    return (
+      <>
+        <Leaderboard leaderboard={leaderboard} onBack={() => setGameState('setup')} />
+        <FeedbackWidget />
+      </>
+    );
   }
 
   if (gameState === 'finished') {
     return (
-      <Results 
-        score={score} 
-        totalQuestions={shuffledQuestions.length}
-        questions={shuffledQuestions}
-        userAnswers={userAnswers}
-        playerName={playerName}
-        quizType={quizType}
-        onRestart={resetQuiz}
-        onShowLeaderboard={showLeaderboard}
-      />
+      <>
+        <Results 
+          score={score} 
+          totalQuestions={shuffledQuestions.length}
+          questions={shuffledQuestions}
+          userAnswers={userAnswers}
+          playerName={playerName}
+          quizType={quizType}
+          onRestart={resetQuiz}
+          onShowLeaderboard={showLeaderboard}
+        />
+        <FeedbackWidget />
+      </>
     );
   }
 
@@ -390,25 +428,28 @@ export const QuizApp: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-900 via-teal-900 to-cyan-900 p-4 font-inter">
-      <div className="max-w-4xl mx-auto">
-        <div className="mb-6 flex justify-between items-center">
-          <div className="text-white">
-            <div className="text-lg font-semibold">{getQuizTypeLabel()}</div>
-            <span className="text-base">Question {currentQuestionIndex + 1} of {shuffledQuestions.length}</span>
-            <span className="ml-4 text-emerald-200">Score: {score}</span>
-            <span className="ml-4 text-emerald-200">Player: {playerName}</span>
+    <>
+      <div className="min-h-screen bg-gradient-to-br from-emerald-900 via-teal-900 to-cyan-900 p-4 font-inter">
+        <div className="max-w-4xl mx-auto">
+          <div className="mb-6 flex justify-between items-center">
+            <div className="text-white">
+              <div className="text-lg font-semibold">{getQuizTypeLabel()}</div>
+              <span className="text-base">Question {currentQuestionIndex + 1} of {shuffledQuestions.length}</span>
+              <span className="ml-4 text-emerald-200">Score: {score}</span>
+              <span className="ml-4 text-emerald-200">Player: {playerName}</span>
+            </div>
+            <Timer timeLeft={timeLeft} />
           </div>
-          <Timer timeLeft={timeLeft} />
+          
+          <Question
+            question={shuffledQuestions[currentQuestionIndex]}
+            selectedAnswer={selectedAnswer}
+            onAnswerSelect={handleAnswerSelect}
+            questionNumber={currentQuestionIndex + 1}
+          />
         </div>
-        
-        <Question
-          question={shuffledQuestions[currentQuestionIndex]}
-          selectedAnswer={selectedAnswer}
-          onAnswerSelect={handleAnswerSelect}
-          questionNumber={currentQuestionIndex + 1}
-        />
       </div>
-    </div>
+      <FeedbackWidget />
+    </>
   );
 };
