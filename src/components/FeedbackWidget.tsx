@@ -21,6 +21,7 @@ export const FeedbackWidget: React.FC = () => {
     setIsSubmitting(true);
 
     try {
+      // Using Formspree.io to send emails to itsramakrushna@gmail.com
       const response = await fetch('https://formspree.io/f/xpwaqnol', {
         method: 'POST',
         headers: {
@@ -29,21 +30,27 @@ export const FeedbackWidget: React.FC = () => {
         body: JSON.stringify({
           name: formData.name,
           email: formData.email,
-          message: formData.suggestions,
-          _replyto: formData.email
+          message: `Suggestion from ${formData.name} (${formData.email}): ${formData.suggestions}`,
+          _replyto: formData.email,
+          _subject: 'New Quiz App Suggestion',
+          _format: 'plain'
         }),
       });
 
       if (response.ok) {
         setIsSubmitted(true);
         setFormData({ name: '', email: '', suggestions: '' });
+        console.log('Feedback submitted successfully');
         setTimeout(() => {
           setIsOpen(false);
           setIsSubmitted(false);
-        }, 2000);
+        }, 3000);
+      } else {
+        throw new Error('Failed to submit feedback');
       }
     } catch (error) {
       console.error('Error submitting feedback:', error);
+      alert('Failed to send feedback. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -89,7 +96,7 @@ export const FeedbackWidget: React.FC = () => {
                 <div className="text-center py-6">
                   <div className="text-4xl mb-4">✅</div>
                   <p className="text-emerald-200 font-medium">
-                    Thank you for your feedback!
+                    Thank you for your feedback! Your suggestion has been sent to Ramkrushna.
                   </p>
                 </div>
               ) : (
