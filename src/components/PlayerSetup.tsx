@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Timer, Trophy, BookOpen, Linkedin, Instagram, Github, Coffee, ExternalLink } from 'lucide-react';
+import { Timer, Trophy, BookOpen, Linkedin, Instagram, Github, Coffee, ExternalLink, Twitter } from 'lucide-react';
 
 interface PlayerSetupProps {
   onStartQuiz: (name: string, quizType: 'quick' | 'extended') => void;
@@ -33,6 +33,11 @@ export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onStartQuiz, onShowLea
       name: 'Topmate',
       url: 'https://topmate.io/ramakrushna_mohapatra',
       icon: <Coffee size={20} />,
+    },
+    {
+      name: 'X',
+      url: 'https://x.com/techwith_ram',
+      icon: <Twitter size={20} />, // Using Twitter icon to represent X
     },
   ];
 
@@ -65,7 +70,7 @@ export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onStartQuiz, onShowLea
         {/* Title and Subtitle */}
         <div className="text-center mb-8">
           <h1 className="text-5xl font-bold text-white font-poppins mb-4 animate-fade-in">
-            🚀 AI & ML Quiz Challenge
+            AI & ML Interview Quiz Prep
           </h1>
           <p className="text-emerald-200 text-xl animate-fade-in">
             Test your knowledge of Artificial Intelligence and Machine Learning
@@ -116,7 +121,7 @@ export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onStartQuiz, onShowLea
               <Button
                 onClick={onShowLeaderboard}
                 variant="outline"
-                className="border-white/30 text-white hover:bg-white/10 py-3 font-semibold font-poppins transition-all duration-300"
+                className="border-white/30 bg-emerald-400 text-white hover:bg-white/10 py-3 font-semibold font-poppins transition-all duration-300"
               >
                 <Trophy className="mr-2" size={20} />
                 View Leaderboard
@@ -125,7 +130,7 @@ export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onStartQuiz, onShowLea
               <Button
                 onClick={onShowPapers}
                 variant="outline"
-                className="border-white/30 text-white hover:bg-white/10 py-3 font-semibold font-poppins transition-all duration-300"
+                className="border-white/30 text-white bg-emerald-400 hover:bg-black/10 py-3 font-semibold font-poppins transition-all duration-300"
               >
                 <BookOpen className="mr-2" size={20} />
                 Read Papers
@@ -134,7 +139,7 @@ export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onStartQuiz, onShowLea
               <Button
                 onClick={() => window.open('https://topmate.io/ramakrushna_mohapatra', '_blank')}
                 variant="outline"
-                className="border-white/30 text-white hover:bg-white/10 py-3 font-semibold font-poppins transition-all duration-300"
+                className="border-white/30 bg-emerald-400 text-white hover:bg-white/10 py-3 font-semibold font-poppins transition-all duration-300"
               >
                 <ExternalLink className="mr-2" size={20} />
                 Get Guidance
@@ -150,6 +155,7 @@ export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onStartQuiz, onShowLea
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-white hover:text-emerald-200 transition-colors duration-200"
+                  aria-label={link.name}
                 >
                   {link.icon}
                 </a>

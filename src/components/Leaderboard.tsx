@@ -132,7 +132,7 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ leaderboard, onBack })
             <div className="mt-8 text-center">
               <Button
                 onClick={onBack}
-                className="px-8 py-3 text-lg font-semibold bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 transform hover:scale-105 transition-all duration-200 font-poppins"
+                className="px-8 py-3 text-lg font-semibold bg-emerald-400 from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 transform hover:scale-105 transition-all duration-200 font-poppins"
               >
                 Back to Quiz
               </Button>

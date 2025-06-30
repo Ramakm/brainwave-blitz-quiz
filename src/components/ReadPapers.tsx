@@ -93,7 +93,7 @@ export const ReadPapers: React.FC<ReadPapersProps> = ({ onBack }) => {
           <Button
             onClick={onBack}
             variant="outline"
-            className="border-white/30 text-white hover:bg-white/10"
+            className="border-white/30 bg-emerald-400 text-white hover:bg-white/10"
           >
             <ArrowLeft className="mr-2" size={20} />
             Back to Quiz
@@ -164,7 +164,7 @@ export const ReadPapers: React.FC<ReadPapersProps> = ({ onBack }) => {
                   </p>
                   <Button
                     onClick={() => window.open(paper.link, '_blank')}
-                    className="bg-gradient-to-r from-teal-500 to-cyan-600 hover:from-teal-600 hover:to-cyan-700 text-white"
+                    className="bg-gradient-to-r bg-emerald-400 from-teal-500 to-cyan-600 hover:from-teal-600 hover:to-cyan-700 text-white"
                   >
                     <ExternalLink className="mr-2" size={16} />
                     Read Paper
