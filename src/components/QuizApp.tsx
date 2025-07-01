@@ -796,10 +796,10 @@ export const QuizApp: React.FC = () => {
   const startQuiz = (name: string, selectedQuizType: 'quick' | 'extended') => {
     const shuffled = shuffleQuestions(quizQuestions);
     const questionCount = selectedQuizType === 'quick' ? 20 : 60;
-    const quizQuestions = shuffled.slice(0, questionCount);
+    const selectedQuestions = shuffled.slice(0, questionCount);
     
-    setShuffledQuestions(quizQuestions);
-    setUserAnswers(new Array(quizQuestions.length).fill(null));
+    setShuffledQuestions(selectedQuestions);
+    setUserAnswers(new Array(selectedQuestions.length).fill(null));
     setPlayerName(name);
     setQuizType(selectedQuizType);
     setGameState('playing');
