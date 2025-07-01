@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -83,8 +82,7 @@ export const Results: React.FC<ResultsProps> = ({
             </Button>
             <Button
               onClick={onShowLeaderboard}
-              variant="outline"
-              className="px-8 py-3 text-lg font-semibold text-white border-white/30 hover:bg-white/10 font-poppins"
+              className="px-8 py-3 text-lg font-semibold bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 transform hover:scale-105 transition-all duration-200 font-poppins text-white"
             >
               View Leaderboard
             </Button>

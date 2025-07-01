@@ -21,17 +21,17 @@ interface ReadPapersProps {
 export const ReadPapers: React.FC<ReadPapersProps> = ({ onBack }) => {
   const [papers, setPapers] = useState<Paper[]>([]);
   const [loading, setLoading] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('artificial intelligence machine learning');
+  const [searchTerm, setSearchTerm] = useState('artificial intelligence machine learning large language models');
   const [error, setError] = useState<string | null>(null);
 
-  const fetchPapers = async (query: string = 'artificial intelligence machine learning') => {
+  const fetchPapers = async (query: string = 'artificial intelligence machine learning large language models') => {
     setLoading(true);
     setError(null);
     
     try {
-      // Using arXiv API
+      // Using arXiv API with expanded search terms for LLM papers
       const searchQuery = encodeURIComponent(query);
-      const apiUrl = `https://export.arxiv.org/api/query?search_query=all:${searchQuery}&start=0&max_results=20&sortBy=submittedDate&sortOrder=descending`;
+      const apiUrl = `https://export.arxiv.org/api/query?search_query=all:${searchQuery}&start=0&max_results=60&sortBy=submittedDate&sortOrder=descending`;
       
       const response = await fetch(apiUrl);
       const xmlText = await response.text();
@@ -67,7 +67,11 @@ export const ReadPapers: React.FC<ReadPapersProps> = ({ onBack }) => {
         });
       }
       
-      setPapers(parsedPapers);
+      // Limit to maximum 50 papers and rotate if needed
+      const limitedPapers = parsedPapers.slice(0, 50);
+      setPapers(limitedPapers);
+      
+      console.log(`Fetched ${limitedPapers.length} papers (limited to 50)`);
     } catch (err) {
       setError('Failed to fetch papers. Please try again.');
       console.error('Error fetching papers:', err);
@@ -100,7 +104,7 @@ export const ReadPapers: React.FC<ReadPapersProps> = ({ onBack }) => {
           </Button>
           <h1 className="text-3xl font-bold text-white font-poppins flex items-center">
             <BookOpen className="mr-3" size={32} />
-            Latest AI & ML Research Papers
+            Latest AI, ML & LLM Research Papers
           </h1>
         </div>
 
@@ -109,7 +113,7 @@ export const ReadPapers: React.FC<ReadPapersProps> = ({ onBack }) => {
             <div className="flex gap-4">
               <Input
                 type="text"
-                placeholder="Search papers by keywords..."
+                placeholder="Search papers by keywords (AI, ML, LLM, GPT, etc.)..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
@@ -123,6 +127,9 @@ export const ReadPapers: React.FC<ReadPapersProps> = ({ onBack }) => {
                 {loading ? <Loader2 className="animate-spin" size={20} /> : <Search size={20} />}
               </Button>
             </div>
+            <p className="text-emerald-200 text-sm mt-2">
+              📊 Showing latest 50 research papers • Updated automatically with newest publications
+            </p>
           </CardContent>
         </Card>
 
@@ -164,7 +171,7 @@ export const ReadPapers: React.FC<ReadPapersProps> = ({ onBack }) => {
                   </p>
                   <Button
                     onClick={() => window.open(paper.link, '_blank')}
-                    className="bg-gradient-to-r bg-emerald-400 from-teal-500 to-cyan-600 hover:from-teal-600 hover:to-cyan-700 text-white"
+                    className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white"
                   >
                     <ExternalLink className="mr-2" size={16} />
                     Read Paper
@@ -186,7 +193,7 @@ export const ReadPapers: React.FC<ReadPapersProps> = ({ onBack }) => {
 
         <div className="mt-8 text-center">
           <p className="text-white/60 text-sm">
-            Papers sourced from arXiv.org - Updated daily with the latest research
+            Papers sourced from arXiv.org - Updated daily with the latest AI, ML & LLM research • Limited to 50 most recent papers
           </p>
         </div>
       </div>
