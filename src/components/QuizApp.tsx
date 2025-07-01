@@ -747,8 +747,8 @@ export const QuizApp: React.FC = () => {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
 
   // Updated function to shuffle both questions and answers with proper question count
-  const shuffleQuestions = (questions: QuizQuestion[]) => {
-    const shuffled = [...questions];
+  const shuffleQuestions = (questionsArray: QuizQuestion[]) => {
+    const shuffled = [...questionsArray];
     // Shuffle the questions array
     for (let i = shuffled.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
@@ -794,9 +794,15 @@ export const QuizApp: React.FC = () => {
   };
 
   const startQuiz = (name: string, selectedQuizType: 'quick' | 'extended') => {
+    console.log('Starting quiz with:', { name, selectedQuizType });
+    console.log('Quiz questions available:', quizQuestions.length);
+    
     const shuffled = shuffleQuestions(quizQuestions);
     const questionCount = selectedQuizType === 'quick' ? 20 : 60;
     const selectedQuestions = shuffled.slice(0, questionCount);
+    
+    console.log('Selected questions:', selectedQuestions.length);
+    console.log('First question:', selectedQuestions[0]);
     
     setShuffledQuestions(selectedQuestions);
     setUserAnswers(new Array(selectedQuestions.length).fill(null));
@@ -807,6 +813,8 @@ export const QuizApp: React.FC = () => {
     setScore(0);
     setTimeLeft(selectedQuizType === 'quick' ? 60 : 300);
     setSelectedAnswer(null);
+    
+    console.log('Quiz state updated to playing');
   };
 
   const handleAnswerSelect = (answerIndex: number) => {
